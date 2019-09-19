@@ -1,0 +1,39 @@
+﻿<language>
+	<operators>
+		+ :: <left_expr> + <right_expr>
+		- :: <left_expr> - <right_expr>
+		* :: <left_expr> * <right_expr>
+		/ :: <left_expr> / <right_expr>
+		= :: <left_expr> = <right_expr>
+	</operators>
+
+	<condition operators>
+		== :: <expr> == <condition>
+		|| :: <boolean_expr> || <boolean_expr>
+		&& :: <boolean_expr> && <boolean_expr>
+		! :: !<boolean_expr>
+		!= :: <expr> != <condition>
+	</condition operators>
+
+	<condition statements>
+		IF :: if (<expr[boolean?]> [+condition operators & <second_expr]){...}
+		ELSE :: else {...}
+		ELSE IF :: (elseif || else if || elsif) (<expr[boolean?]> [+condition operators & <second_expr>]){...}
+	</condition statements>
+
+	<loops statements>
+		WHILE :: while (<expr[boolean?]> [+condition operators & <second_expr>]){...}
+		FOR :: for (<start_value>;<condition>;<incrementation>){...}
+		FOREACH :: foreach ({TYPE}<_ElementName> in <_ArrayName>){...}
+	</loops statements>
+
+	<Types>
+		integer  :: {integer;int;itg;intg}
+		boolean :: {boolean;bool;bll}
+		float :: {float;flt}
+		double :: {double;dbl;dble}
+		string :: {string;strg;str}
+		short :: {short;shrt}
+		long :: {long;lng}
+	</Types>
+</language>
