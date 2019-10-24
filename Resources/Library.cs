@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -128,9 +129,24 @@ namespace Total_library
             result = Math.Sqrt(result);
             return result;
         }
-        public static double SQRT(double squareT)
+        public static decimal SQRT(decimal squareT)
         {
-            return (squareT / squareT);
+            decimal sqrt = 0;
+            decimal increment = 1;
+            while (true)
+            {
+                if ((increment * increment) == squareT)
+                {
+                    break;
+                }
+                else
+                {
+                    increment++;
+                    continue;
+                }
+            }
+            sqrt = increment;
+            return sqrt;
         }
         public static double ToSquare(double toSquare)
         {
@@ -1636,5 +1652,10 @@ namespace Total_library
             else
                 return false;
         }
+    }
+
+    public sealed class MemoryManagement
+    {
+        
     }
 }
