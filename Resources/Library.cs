@@ -8,9 +8,25 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections;
+using System.Reflection;
 
 namespace Total_library
 {
+    public sealed class ILibrary
+    {
+        public interface IGetHash
+        {
+            string GetHash(string str);
+            string InverseHash(string str);
+        }
+        public interface IGetHashBool
+        {
+            string GetHash(bool bll);
+            bool InverseHash(string str);
+            bool? TryInverseHash(string str);
+        }
+    }
     public sealed class Errors
     {
         public static class Maths
@@ -44,6 +60,13 @@ namespace Total_library
         public static class FilesIO
         {
             public static Exception FileNotFound = new Exception("Referenced file hasn't been found !");
+        }
+        public static class CodeNode
+        {
+            public static class AccessChild
+            {
+                public static Exception UnknownChild = new Exception("This code child don't exists !");
+            }
         }
     }
     public sealed class Maths
@@ -1656,6 +1679,277 @@ namespace Total_library
 
     public sealed class MemoryManagement
     {
-        
+        public void malloc(out IntPtr MemoryVar, int MemorySize)
+        {
+            MemoryVar = Marshal.AllocHGlobal(MemorySize);
+        }
+        public bool TryMalloc(out IntPtr MemoryVar, int MemorySize)
+        {
+            try
+            {
+                MemoryVar = Marshal.AllocHGlobal(MemorySize);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("=> Allocation of 0 bit of memory.");
+                MemoryVar = Marshal.AllocHGlobal(0);
+                return false;
+            }
+        }
+
+        public void free(IntPtr MemoryVar)
+        {
+            Marshal.FreeHGlobal(MemoryVar);
+        }
+        public bool TryFree(IntPtr MemoryVar)
+        {
+            try
+            {
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Unable to free this memory bloc.");
+                return false;
+            }
+        }
     }
+
+    public sealed class GetHash
+    {
+        public sealed class FromChar : ILibrary.IGetHash
+        {
+            private Dictionary<char, string> ToHash = new Dictionary<char, string>();
+            private Dictionary<string, char> FromHash = new Dictionary<string, char>();
+
+            public FromChar()
+            {
+                // ToHash dictionnary declarations.
+                ToHash.Add(' ', "0x000");
+                ToHash.Add('!', "0x001");
+                ToHash.Add('"', "0x003");
+                ToHash.Add('#', "0x004");
+                ToHash.Add('$', "0x005");
+                ToHash.Add('%', "0x006");
+                ToHash.Add('&', "0x007");
+                ToHash.Add('\'', "0x008");
+                ToHash.Add('(', "0x009");
+                ToHash.Add(')', "0x01");
+                ToHash.Add('*', "0x02");
+                ToHash.Add('+', "0x03");
+                ToHash.Add(',', "0x04");
+                ToHash.Add('-', "0x05");
+                ToHash.Add('.', "0x06");
+                ToHash.Add('/', "0x07");
+                ToHash.Add(':', "0x08");
+                ToHash.Add(';', "0x09");
+                ToHash.Add('<', "0x1");
+                ToHash.Add('=', "0x2");
+                ToHash.Add('>', "0x3");
+                ToHash.Add('?', "0x4");
+                ToHash.Add('@', "0x5");
+                ToHash.Add('[', "0x6");
+                ToHash.Add('\\', "0x7");
+                ToHash.Add(']', "0x8");
+                ToHash.Add('^', "0x9");
+                ToHash.Add('_', "1E");
+                ToHash.Add('`', "2E");
+                ToHash.Add('{', "3E");
+                ToHash.Add('|', "4E");
+                ToHash.Add('}', "5E");
+                ToHash.Add('~', "6E");
+                ToHash.Add('0', "0%0!000");
+                ToHash.Add('1', "0%1!010");
+                ToHash.Add('2', "0%2!200");
+                ToHash.Add('3', "0%3!003");
+                ToHash.Add('4', "1%0!000");
+                ToHash.Add('5', "1%1!010");
+                ToHash.Add('6', "1%2!200");
+                ToHash.Add('7', "1%3!003");
+                ToHash.Add('8', "2E%H!0f2");
+                ToHash.Add('9', "3E%H!f2x");
+                ToHash.Add('A', "%1#[0%0!000]=000");
+                ToHash.Add('B', "%1#[0%1!010]=001");
+                ToHash.Add('C', "%1#[0%2!200]=002");
+                ToHash.Add('D', "%1#[0%3!003]=003");
+                ToHash.Add('E', "%1#[1%0!000]=004");
+                ToHash.Add('F', "%1#[1%1!010]=005");
+                ToHash.Add('G', "%1#[1%2!200]=006");
+                ToHash.Add('H', "%1#[1%3!003]=007");
+                ToHash.Add('I', "%1#[2E%H!0f2]=008");
+                ToHash.Add('J', "%1#[3E%H!f2x]=009");
+                ToHash.Add('K', "%2#[0%0!000]=01");
+                ToHash.Add('L', "%2#[0%1!010]=02");
+                ToHash.Add('M', "%2#[0%2!200]=03");
+                ToHash.Add('N', "%2#[0%3!003]=04");
+                ToHash.Add('O', "%2#[1%0!000]=05");
+                ToHash.Add('P', "%2#[1%1!010]=06");
+                ToHash.Add('Q', "%2#[1%2!200]=07");
+                ToHash.Add('R', "%2#[1%3!003]=08");
+                ToHash.Add('S', "%2#[2E%H!0f2]=09");
+                ToHash.Add('T', "%2#[3E%h!f2x]=1");
+                ToHash.Add('U', "3E%S3#[0%0!000]=2");
+                ToHash.Add('V', "4E%S3#[0%1!010}=3");
+                ToHash.Add('W', "5E%S3#[0%2!200]=4");
+                ToHash.Add('X', "6E%S3#[0%3!003]=5");
+                ToHash.Add('Y', "7E%S3#[1%0!000]=6");
+                ToHash.Add('Z', "8E%S3#[1%1!010]=7");
+                ToHash.Add('a', "%1&{0%0!000}=000");
+                ToHash.Add('b', "%1&{0%1!010}=001");
+                ToHash.Add('c', "%1&{0%2!200}=002");
+                ToHash.Add('d', "%1&{0%3!003}=003");
+                ToHash.Add('e', "%1&{1%0!000}=004");
+                ToHash.Add('f', "%1&{1%1!010}=005");
+                ToHash.Add('g', "%1&{1%2!200}=006");
+                ToHash.Add('h', "%1&{1%3!003})007");
+                ToHash.Add('i', "%1&{2E%H!0f2}=008");
+                ToHash.Add('j', "%1&{3E%H!f2x}=009");
+                ToHash.Add('k', "%2&{0%0!000}=01");
+                ToHash.Add('l', "%2&{0%1!010}=02");
+                ToHash.Add('m', "%2&{0%2!200}=03");
+                ToHash.Add('n', "%2&{0%3!003}=04");
+                ToHash.Add('o', "%2&{1%0!000}=05");
+                ToHash.Add('p', "%2&{1%1!010}=06");
+                ToHash.Add('q', "%2&{1%2!200}=07");
+                ToHash.Add('r', "%2&{1%3!003}=08");
+                ToHash.Add('s', "%2&{2E%H!0f2}=09");
+                ToHash.Add('t', "%2&{3E%H!f2x}=1");
+                ToHash.Add('u', "3E%S3&{0%0!000}=2");
+                ToHash.Add('v', "4E%S3&{0%1!010}=3");
+                ToHash.Add('w', "5E%S3&{0%2!200}=4");
+                ToHash.Add('x', "6E%S3&{0%3!003}=5");
+                ToHash.Add('y', "7E%S3&{1%0!000}=6");
+                ToHash.Add('z', "8E%S3&{1%1!010}=7");
+
+                FromHash = Utility.UDictionary<char, string>.Inverse(ToHash);
+            }
+
+            public string GetHash(string str)
+            {
+                string final = "";
+                foreach (char _Sub in str)
+                {
+                    if (final == "")
+                        final += ToHash[_Sub];
+                    else
+                        final += " " + ToHash[_Sub];
+                }
+                return final;
+            }
+            private List<string> Parser(string str)
+            {
+                string calcStr = str;
+
+                string[] calcStrSplit;
+                calcStrSplit = calcStr.Split(new char[] { ' ' });
+                List<string> calcStrTrim = calcStrSplit.ToList<string>();
+
+                foreach (string sub in calcStrTrim)
+                {
+                    if (sub == " ")
+                        calcStrTrim.Remove(sub);
+                }
+
+                List<string> final = calcStrTrim;
+                
+                return final;
+            }
+            public string InverseHash(string str)
+            {
+                string final = "";
+                List<string> parsedStr = Parser(str);
+                
+                foreach (string sub in parsedStr)
+                {
+                    final += FromHash[sub];
+                }
+
+                return final;
+            }
+        }
+        public sealed class FromBool : ILibrary.IGetHashBool
+        {
+            private Dictionary<bool, string> ToHash = new Dictionary<bool, string>();
+            private Dictionary<string, bool> FromHash = new Dictionary<string, bool>();
+
+            public FromBool()
+            {
+                ToHash.Add(true, "B1%{@VE}%"); // B1 = Binary 1 (true) ; VE = Value Entry.
+                ToHash.Add(false, "B0%{@VO}%"); // B0 = Binary 0 (false) ; VO = Value Out.
+
+                FromHash = Utility.UDictionary<bool, string>.Inverse(ToHash);
+            }
+
+            public string GetHash(bool bll)
+            {
+                string final = "";
+                final = ToHash[bll];
+                return final;
+            }
+            public bool InverseHash(string str)
+            {
+                bool final;
+                final = FromHash[str];
+                return final;
+            }
+            public bool? TryInverseHash(string str)
+            {
+                bool? final;
+                try
+                {
+                    final = FromHash[str];
+                    return final;
+                }
+                catch
+                {
+                    Console.WriteLine(new Exception("Can't convert this string to a boolean from the encoding structure."));
+                    return null;
+                }
+            }
+        }
+        public sealed class CreateEncoding<TKey, TValue>
+        {
+            public Dictionary<TKey, TValue> ToHash = new Dictionary<TKey, TValue>();
+            public Dictionary<TValue, TKey> FromHash = new Dictionary<TValue, TKey>();
+
+            public CreateEncoding(Dictionary<TKey, TValue> encodingStructure)
+            {
+                ToHash = encodingStructure;
+                FromHash = Utility.UDictionary<TKey, TValue>.Inverse(ToHash);
+            }
+        }
+    }
+
+    public sealed class Utility
+    {
+        public sealed class UDictionary<TKey, TValue>
+        {
+            public static Dictionary<TValue, TKey> Inverse(Dictionary<TKey, TValue> inputDico)
+            {
+
+                Dictionary<TKey, TValue> calcDico = inputDico;
+                Dictionary<TValue, TKey> finalDico = new Dictionary<TValue, TKey>();
+                List<TKey> keys = new List<TKey>();
+                List<TValue> values = new List<TValue>();
+
+                keys = calcDico.Keys.ToList();
+
+                foreach (TKey key in keys)
+                {
+                    values.Add(calcDico[key]);
+                }
+
+                for (int i = 0; i < keys.Count; i++)
+                {
+                    finalDico.Add(values[i], keys[i]);
+                }
+
+                return finalDico;
+            }
+        }
+    }
+
 }
