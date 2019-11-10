@@ -10,6 +10,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Collections;
 using System.Reflection;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 
 namespace Total_library
 {
@@ -810,7 +812,7 @@ namespace Total_library
             return sorted_parsing;
         }
     }
-    public sealed class Types
+    public sealed class Prototypes_Types
     {
         public sealed class _Int
         {
@@ -1152,6 +1154,229 @@ namespace Total_library
                 return finalList;
             }
         }        
+    }
+
+    namespace Types
+    {
+        // Don't run : generate a StackOverFlowException.
+        public struct MInt : IComparable, IEquatable<MInt>, IComparable<MInt>
+        {
+            public static readonly MInt MaxValue = 2147483647;
+            public static readonly MInt MinValue = -2147483647;
+            public static readonly MInt NoneValue = 'N';
+
+            private int PVal { get; set; }
+            
+            public MInt(int value)
+            {
+                var v = value;
+                this = v;
+            }
+            
+            public static MInt Parse(string s)
+            {
+                var intS = int.Parse(s);
+                return new MInt(intS);
+            }
+            public static MInt Parse(int i)
+            {
+                return new MInt(i);
+            }
+            public int CompareTo(MInt value)
+            {
+                if (this < value)
+                    return -1;
+                else if (this == value)
+                    return 0;
+                else
+                    return 1;
+            }
+            public int CompareTo(object value)
+            {
+                if (value is MInt)
+                {
+                    if (this < (MInt)value)
+                        return -1;
+                    else if (this == (MInt)value)
+                        return 0;
+                    else
+                        return 1;
+                }
+                else
+                    throw new ArgumentException("value n'est pas Total_library.Types.MInt.");
+            }
+            public override bool Equals(object obj)
+            {
+                if (obj is MInt && (MInt)obj == this)
+                    return true;
+                else
+                    return false;
+
+            }
+            public bool Equals(MInt obj)
+            {
+                return this == obj;
+            }
+            public override int GetHashCode()
+            {
+                return (int)this;
+            }
+            public override string ToString()
+            {
+                return string.Concat(this);
+            }
+            public static string ToString(MInt obj)
+            {
+                return string.Concat(obj);
+            }
+            public bool ToBoolean(MInt obj)
+            {
+                if (obj == 1)
+                    return true;
+                else if (obj == 0)
+                    return false;
+                else
+                    throw new ArgumentException("obj n'est pas égal à 0 ou 1");
+            }
+
+            public static MInt operator +(MInt i)
+            {
+                return +i;
+            }
+            public static MInt operator +(MInt i1, MInt i2)
+            {
+                return i1 + i2;
+            }
+            public static MInt operator -(MInt i)
+            {
+                return -i;
+            }
+            public static MInt operator -(MInt i1, MInt i2)
+            {
+                return i1 - i2;
+            }
+            public static MInt operator ++(MInt i)
+            {
+                return i++;
+            }
+            public static MInt operator --(MInt i)
+            {
+                return i--;
+            }
+            public static MInt operator *(MInt i1, MInt i2)
+            {
+                return i1 * i2;
+            }
+            public static MInt operator /(MInt i1, MInt i2)
+            {
+                return i1 / i2;
+            }
+            public static MInt operator %(MInt i1, MInt i2)
+            {
+                return i1 % i2;
+            }
+            public static bool operator ==(MInt left, MInt right)
+            {
+                return left == right;
+            }
+            public static bool operator !=(MInt left, MInt right)
+            {
+                return left != right;
+            }
+            public static bool operator <(MInt left, MInt right)
+            {
+                return left < right;
+            }
+            public static bool operator >(MInt left, MInt right)
+            {
+                return left > right;
+            }
+            public static bool operator <=(MInt left, MInt right)
+            {
+                return left <= right;
+            }
+            public static bool operator >=(MInt left, MInt right)
+            {
+                return left >= right;
+            }
+
+            public static implicit operator MInt(int value)
+            {
+                return new MInt(value);
+            }
+            public static implicit operator MInt(char value)
+            {
+                return (MInt)value;
+            }
+            public static implicit operator MInt(ushort value)
+            {
+                return (MInt)value;
+            }
+            public static implicit operator MInt(short value)
+            {
+                return (MInt)value;
+            }
+            public static implicit operator MInt(sbyte value)
+            {
+                return (MInt)value;
+            }
+            public static implicit operator MInt(byte value)
+            {
+                return (MInt)value;
+            }
+            public static explicit operator ulong(MInt value)
+            {
+                return (ulong)value;
+            }
+            public static explicit operator long(MInt value)
+            {
+                return (long)value;
+            }
+            public static explicit operator uint(MInt value)
+            {
+                return (uint)value;
+            }
+            public static explicit operator int(MInt value)
+            {
+                return value.PVal;
+            }
+            public static explicit operator char(MInt value)
+            {
+                return (char)value;
+            }
+            public static explicit operator ushort(MInt value)
+            {
+                return (ushort)value;
+            }
+            public static explicit operator short(MInt value)
+            {
+                return (short)value;
+            }
+            public static explicit operator sbyte(MInt value)
+            {
+                return (sbyte)value;
+            }
+            public static explicit operator byte(MInt value)
+            {
+                return (byte)value;
+            }
+            public static explicit operator string(MInt value)
+            {
+                return value.ToString();
+            }
+            public static explicit operator MInt(string s)
+            {
+                return Parse(s);
+            }
+            public static explicit operator float(MInt value)
+            {
+                return (float)value;
+            }
+            public static explicit operator double(MInt value)
+            {
+                return (double)value;
+            }
+        }
     }
     public sealed class Log
     {
@@ -1707,6 +1932,7 @@ namespace Total_library
         {
             try
             {
+                Marshal.FreeHGlobal(MemoryVar);
                 return true;
             }
             catch (Exception e)
@@ -1761,6 +1987,15 @@ namespace Total_library
                 ToHash.Add('|', "4E");
                 ToHash.Add('}', "5E");
                 ToHash.Add('~', "6E");
+                ToHash.Add('²', "7E");
+                ToHash.Add('\n', "8E");
+                ToHash.Add('\0', "9E");
+                ToHash.Add('\a', "1%1E");
+                ToHash.Add('\b', "1%2E");
+                ToHash.Add('\r', "1%3E");
+                ToHash.Add('\f', "1%4E");
+                ToHash.Add('\t', "1%5E");
+                ToHash.Add('\v', "1%6E");
                 ToHash.Add('0', "0%0!000");
                 ToHash.Add('1', "0%1!010");
                 ToHash.Add('2', "0%2!200");
@@ -1823,6 +2058,16 @@ namespace Total_library
                 ToHash.Add('x', "6E%S3&{0%3!003}=5");
                 ToHash.Add('y', "7E%S3&{1%0!000}=6");
                 ToHash.Add('z', "8E%S3&{1%1!010}=7");
+                ToHash.Add('µ', "1%E%Ex%0");
+                ToHash.Add('é', "1%E%Ex%1");
+                ToHash.Add('è', "1%E%Ex%2");
+                ToHash.Add('à', "1%E%Ex%3");
+                ToHash.Add('¤', "1%E%Ex%4");
+                ToHash.Add('£', "1%E%Ex%5");
+                ToHash.Add('§', "1%E%Ex%6");
+                ToHash.Add('¨', "1%E%Ex%7");
+                ToHash.Add('ç', "1%E%Ex%8");
+                ToHash.Add('ù', "1%E%Ex%9");
 
                 FromHash = Utility.UDictionary<char, string>.Inverse(ToHash);
             }
@@ -1832,10 +2077,19 @@ namespace Total_library
                 string final = "";
                 foreach (char _Sub in str)
                 {
-                    if (final == "")
-                        final += ToHash[_Sub];
-                    else
-                        final += " " + ToHash[_Sub];
+                    try
+                    {
+                        Console.WriteLine(_Sub + " -> " + ToHash[_Sub]);
+                        if (final == "")
+                            final += ToHash[_Sub];
+                        else
+                            final += " " + ToHash[_Sub];
+                    }
+                    catch (KeyNotFoundException e)
+                    {
+                        Console.WriteLine("Key not found : " + _Sub);
+                        Console.WriteLine(e.Message);
+                    }
                 }
                 return final;
             }
@@ -1950,6 +2204,220 @@ namespace Total_library
                 return finalDico;
             }
         }
-    }
+        public sealed class UStringAndNumbers
+        {
+            public static bool IsNumber(char str)
+            {
+                if (str == '1' || str == '2' || str == '3' || str == '4' || str == '5' || str == '6' || str == '7' || str == '8' || str == '9')
+                    return true;
+                else
+                    return false;
+            }
+            public static bool IsOperand(char str)
+            {
+                if (str == '+' || str == '-' || str == '/' || str == '*' || str == '%')
+                    return true;
+                else
+                    return false;
+            }
+            public static double ComputeMathFormula(string formula)
+            {
+                double result = double.NaN;
+                CodeCompileUnit unit = prepareCompileUnit(formula);
+                Assembly dynamicAssembly = compileCode(unit, "CSharp");
+                if (dynamicAssembly != null)
+                {
+                    object formulaComputer = dynamicAssembly.CreateInstance("DynGen.Compute.formulaComputing", true);
+                    MethodInfo computeFormula = formulaComputer.GetType().GetMethod("computeFormula");
+                    result = (double)computeFormula.Invoke(formulaComputer, null);
+                }
+                return result;
+            }
+            private static Assembly compileCode(CodeCompileUnit compileunit, string language)
+            {
+                CompilerParameters compilerParameters = new CompilerParameters();
+                compilerParameters.ReferencedAssemblies.Add("System.dll");
+                compilerParameters.GenerateExecutable = false;
+                compilerParameters.GenerateInMemory = true;
+                compilerParameters.IncludeDebugInformation = false;
+                compilerParameters.WarningLevel = 1;
+                // compile.
+                CodeDomProvider provider = CodeDomProvider.CreateProvider(language);
+                CompilerResults compilerResults = provider.CompileAssemblyFromDom(compilerParameters, compileunit);
 
+                // Return assembly if compilation OK - otherwise return null
+                return (compilerResults.Errors.Count == 0) ? compilerResults.CompiledAssembly : null;
+            }
+            private static CodeCompileUnit prepareCompileUnit(string formulaString)
+            {
+                CodeNamespace compute = new CodeNamespace("DynGen.Compute");
+                compute.Imports.Add(new CodeNamespaceImport("System"));
+                CodeCompileUnit compileUnit = new CodeCompileUnit();
+                compileUnit.Namespaces.Add(compute);
+                CodeTypeDeclaration formulaComputing = new CodeTypeDeclaration("formulaComputing");
+                compute.Types.Add(formulaComputing);
+                CodeMemberMethod computeFormulaCode = new CodeMemberMethod();
+                computeFormulaCode.Attributes = MemberAttributes.Public;
+                computeFormulaCode.Name = "computeFormula";
+                computeFormulaCode.ReturnType = new CodeTypeReference(typeof(double));
+                CodeSnippetExpression formula = new CodeSnippetExpression(formulaString);
+                CodeMethodReturnStatement computeFormulaReturnStatement = new CodeMethodReturnStatement(formula);
+                computeFormulaCode.Statements.Add(computeFormulaReturnStatement);
+
+                formulaComputing.Members.Add(computeFormulaCode);
+                return compileUnit;
+            }
+        }
+    }
+    namespace Binary
+    {
+#pragma warning disable CS0660, CS0661
+        public sealed class Operations
+        {
+            private short Entry1;
+            private short Entry2;
+
+            public Operations(Bit bit1, Bit bit2)
+            {
+                this.Entry1 = bit1.status;
+                this.Entry2 = bit2.status;
+            }
+
+            public bool AND()
+            {
+                if (Entry1 == 1 && Entry2 == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public bool NOT()
+            {
+                if (Entry1 == 0 && Entry2 == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public bool OR()
+            {
+                if (Entry1 == 1 || Entry2 == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            public bool XOR()
+            {
+                if (Entry1 == 1 && Entry2 == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public static bool operator ==(Operations a, Operations b)
+            {
+                if (a.Entry1 == b.Entry1 && a.Entry2 == b.Entry2)
+                    return true;
+                else
+                    return false;
+            }
+            public static bool operator !=(Operations a, Operations b)
+            {
+                if (a == b)
+                    return false;
+                else
+                    return true;
+            }
+        }
+        public sealed class Bit
+        {
+            public short status;
+            public Bit(BinaryValues bitVal)
+            {
+                this.status = bitVal.status;
+            }
+
+            public static bool operator ==(Bit a, Bit b)
+            {
+                if (a.status == b.status)
+                    return true;
+                else
+                    return false;
+            }
+            public static bool operator !=(Bit a, Bit b)
+            {
+                if (a == b)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+        public struct BinaryValues
+        {
+            public const short active = 1;
+            public const short inactive = 0;
+            public const short @default = 0;
+            public short status 
+            {
+                get { return status; }
+                set
+                {
+                    if (value <= active && value >= inactive)
+                    {
+                        status = value;
+                    }
+                    else
+                    {
+                        throw new Exception("The given value isn't a binary value (0|1) !");
+                    }
+                }
+            }
+            public BinaryValues(short status)
+            {
+                try
+                {
+                    this.status = status;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    this.status = @default;
+                }
+            }
+
+            public static bool operator ==(BinaryValues a, BinaryValues b)
+            {
+                if (a.status == b.status)
+                    return true;
+                else
+                    return false;
+            }
+            public static bool operator !=(BinaryValues a, BinaryValues b)
+            {
+                if (a == b)
+                    return false;
+                else
+                    return true;
+            }
+#pragma warning restore CS0660, CS0661
+        }
+    }
 }
