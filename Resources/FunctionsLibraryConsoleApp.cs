@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using Total_library;
+using ByteReflection;
 
 namespace FunctionsLibraryConsoleApp
 {
@@ -9,19 +12,23 @@ namespace FunctionsLibraryConsoleApp
     {
         static void Main(string[] args)
         {
+            //Reflection refl = new Reflection();
+            //Console.WriteLine(refl.Calc("Math.Sqrt(89)"));
             Console.WriteLine("Allocate memory...");
             IntPtr hglobal = Marshal.AllocHGlobal(1000000000);
             IntPtr userMem = Marshal.AllocHGlobal(1024);
             Console.WriteLine("Loading libraries...");
             Console.WriteLine("Preparing Environment...");
 
-            string inputMetaString = "\n@localhost{" + Environment.UserName + "}$~";
-            string[] help = new string[5] { "help", "compiler", "memory", "exit", "quit" };
+            string[] help = new string[] { "help", "compiler", "memory", "exit", "quit", "calc | math" };
 
             Console.WriteLine("Environment : OK\nHello " + Environment.UserName + "!\n");
 
             while (true)
             {
+
+                string inputMetaString = "\n@localhost{" + Environment.UserName + "}$~";
+
                 Console.Write(inputMetaString);
                 string command = Console.ReadLine();
                 if (command == "compiler")
@@ -84,6 +91,12 @@ namespace FunctionsLibraryConsoleApp
                                 userMem = Marshal.AllocHGlobal(int.MaxValue);
                             }
                         }
+                        else if (command == "currentInfs")
+                        {
+                            Process processes = new Process();
+                            Process curr = Process.GetCurrentProcess();
+                            Console.WriteLine(curr.PrivateMemorySize64);
+                        }
                         else if (command == "help")
                         {
                             string[] helpArray = new string[5] { "help", "exit", "quit", "free", "alloc" };
@@ -98,6 +111,18 @@ namespace FunctionsLibraryConsoleApp
                     }
                     continue;
                 }
+                else if (command == "math" || command == "calc")
+                {
+                    while (command != "quit" || command != "exit")
+                    {
+                        Console.Write(inputMetaString + "Maths/&~[input expr : ");
+                        command = Console.ReadLine();
+                        if (command == "quit" || command == "exit")
+                            break;
+                        else
+                            Console.WriteLine(Utility.UStringAndNumbers.ComputeMathFormula(command));                        
+                    }
+                }
                 else if (command == "exit" || command ==  "quit")
                 {
                     Console.WriteLine("Releasing memory...");
@@ -108,7 +133,7 @@ namespace FunctionsLibraryConsoleApp
                     }
                     catch
                     {
-                        Console.WriteLine("User memory already releaed !");
+                        Console.WriteLine("User memory already released !");
                     }
                     Environment.Exit(0);
                 }
